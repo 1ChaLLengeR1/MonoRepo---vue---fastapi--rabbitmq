@@ -11,8 +11,8 @@ services:
     image: postgres:15
     container_name: postgres_main
     environment:
-      POSTGRES_USER: main
-      POSTGRES_PASSWORD: main
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: zaq1@WSX
       POSTGRES_DB: main_db
     ports:
       - "5433:5432"
@@ -21,32 +21,32 @@ services:
     image: postgres:15
     container_name: postgres_service
     environment:
-      POSTGRES_USER: service
-      POSTGRES_PASSWORD: service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: zaq1@WSX
       POSTGRES_DB: service_db
     ports:
       - "5434:5432"
 
   backend_main:
-    build: ./backend_main
+    build: ./main_backend
     container_name: backend_main
     depends_on:
       - postgres_main
       - rabbitmq
     ports:
-      - "8000:8000"
+      - "3000:3000"
 
   backend_service:
-    build: ./backend_service
+    build: ./service_backend
     container_name: backend_service
     depends_on:
       - postgres_service
       - rabbitmq
     ports:
-      - "8001:8000"
+      - "4000:4000"
 
-  frontend:
-    build: ./frontend
-    container_name: frontend
-    ports:
-      - "5173:5173"
+#  frontend:
+#    build: ./frontend
+#    container_name: frontend
+#    ports:
+#      - "5173:5173"

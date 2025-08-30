@@ -1,0 +1,4 @@
+DELETE FROM user_two;
+
+
+DROP EXTENSION IF EXISTS "uuid-ossp";
