@@ -1,7 +1,8 @@
 import os
 from dotenv import load_dotenv
 
-env_file_path = os.path.join('utils', f'.env')
+# Ścieżka do pliku .env w tym samym katalogu co main_backend
+env_file_path = os.path.join(os.path.dirname(__file__), '..', '.env')
 load_dotenv(env_file_path)
 
 def get_env_variable(name_env: str) -> str:

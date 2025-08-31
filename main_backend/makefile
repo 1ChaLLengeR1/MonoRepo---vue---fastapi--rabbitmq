@@ -8,5 +8,8 @@ clean_cache:
 lint:
 	flake8 .
 
+run_worker:
+	celery -A celery_app.celery_app worker --loglevel=info
+
 run_app:
-	uvicorn main:app --reload --log-level debug --port 3000
+	uvicorn main:app_main --reload --log-level debug --port 3000
