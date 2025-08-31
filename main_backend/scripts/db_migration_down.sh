@@ -16,15 +16,15 @@ if [ -z "$DB_HOST" ] || [ -z "$DB_PORT" ] || [ -z "$DB_USER" ] || [ -z "$DB_PASS
     exit 1
 fi
 
-if [ ! -f ../database/database_up.sql ]; then
-    echo "Plik ../database/database_up.sql nie istnieje!"
+if [ ! -f ../database/database_down.sql ]; then
+    echo "Plik ../database/database_down.sql nie istnieje!"
     sleep 10
     exit 1
 fi
 
 
 export PGPASSWORD="$DB_PASSWORD_SCRIPT"
-psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_DBNAME" -p "$DB_PORT" -f "../database/database_up.sql"
+psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_DBNAME" -p "$DB_PORT" -f "../database/database_down.sql"
 
 
 if [ $? -eq 0 ]; then

@@ -7,6 +7,11 @@ services:
       - "5672:5672"   # port do komunikacji aplikacji
       - "15672:15672" # panel web (http://localhost:15672, login: guest/guest)
 
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
   postgres_main:
     image: postgres:15
     container_name: postgres_main
@@ -35,6 +40,13 @@ services:
       - rabbitmq
     ports:
       - "3000:3000"
+
+  celery_worker:
+    build: ./main_backend
+    command: celery -A celery worker --loglevel=info
+    depends_on:
+      - backend_main
+      - redis
 
   backend_service:
     build: ./service_backend

@@ -10,7 +10,7 @@ fi
 
 source "$ENV_FILE"
 
-if [ -z "$DB_HOST_2" ] || [ -z "$DB_PORT_2" ] || [ -z "$DB_USER_2" ] || [ -z "$DB_PASSWORD_2" ] || [ -z "$DB_DBNAME_2" ]; then
+if [ -z "$DB_HOST" ] || [ -z "$DB_PORT" ] || [ -z "$DB_USER" ] || [ -z "$DB_PASSWORD" ] || [ -z "$DB_DBNAME" ]; then
     echo "Wszystkie zmienne środowiskowe muszą być ustawione w pliku local.env"
     sleep 10
     exit 1
@@ -23,8 +23,8 @@ if [ ! -f ../database/database_up.sql ]; then
 fi
 
 
-export PGPASSWORD="$DB_PASSWORD_SCRIPT_2"
-psql -h "$DB_HOST_2" -U "$DB_USER_2" -d "$DB_DBNAME_2" -p "$DB_PORT_2" -f "../database/database_up.sql"
+export PGPASSWORD="$DB_PASSWORD_SCRIPT"
+psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_DBNAME" -p "$DB_PORT" -f "../database/database_up.sql"
 
 
 if [ $? -eq 0 ]; then
