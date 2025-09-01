@@ -1,6 +1,6 @@
-from main_backend.tasks.update import update_user_task
+from tasks.update import update_user_task
 
-def handler_update_user(user_id: str, name: str = None, lastname: str = None, email: str = None, age: str = None, city: str = None) -> dict:
+async def handler_update_user(user_id: str, name: str = None, lastname: str = None, email: str = None, age: str = None, city: str = None) -> dict:
     try:
         task = update_user_task.delay(user_id, name, lastname, email, age, city)
         

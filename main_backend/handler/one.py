@@ -1,4 +1,4 @@
-from main_backend.repository.one import one_user_psql
+from repository.one import one_user_psql
 
 def handler_one_user(user_id: str) -> dict:
     try:

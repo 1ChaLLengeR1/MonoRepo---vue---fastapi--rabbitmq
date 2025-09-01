@@ -1,10 +1,10 @@
-from main_backend.database.db import get_db
+from database.db import get_db
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from main_backend.database.model import UserOne
+from database.model import UserOne
 
 
-def collection_user_psql() -> dict:
+async def collection_user_psql() -> dict:
     db_generator = get_db()
     db: Session = next(db_generator)
     try:

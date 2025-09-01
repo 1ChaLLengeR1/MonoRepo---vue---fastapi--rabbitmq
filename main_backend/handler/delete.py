@@ -1,6 +1,6 @@
-from main_backend.tasks.delete import delete_user_task
+from tasks.delete import delete_user_task
 
-def handler_delete_user(user_id: str) -> dict:
+async def handler_delete_user(user_id: str) -> dict:
     try:
         task = delete_user_task.delay(user_id)
         

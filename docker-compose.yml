@@ -4,8 +4,8 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - "5672:5672"   # port do komunikacji aplikacji
-      - "15672:15672" # panel web (http://localhost:15672, login: guest/guest)
+      - "5672:5672"
+      - "15672:15672"
 
   redis:
     image: redis:7
@@ -44,6 +44,10 @@ services:
       - rabbitmq
     ports:
       - "3000:3000"
+    volumes:
+      - ./main_backend:/app
+    environment:
+      - PYTHONPATH=/app
 #  backend_service:
 #    build: ./service_backend
 #    container_name: backend_service
@@ -59,6 +63,10 @@ services:
     depends_on:
       - backend_main
       - redis
+    volumes:
+      - ./main_backend:/app
+    environment:
+      - PYTHONPATH=/app
 
 #  frontend:
 #    build: ./frontend
