@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from database.model import UserOne
 
 
-def delete_user_psql(user_id: str) -> dict:
+def main_delete_user_psql(user_id: str) -> dict:
     db_generator = get_db()
     db: Session = next(db_generator)
     try:
@@ -14,14 +14,16 @@ def delete_user_psql(user_id: str) -> dict:
                 "message": "User not found",
                 "status_code": 404
             }
-        
+
+        user_email = user.email
+
         db.delete(user)
         db.commit()
-        
+
         return {
             "message": "User deleted successfully",
             "status_code": 200,
-            "user_id": str(user_id)
+            "email": str(user_email)
         }
 
     except IntegrityError as e:

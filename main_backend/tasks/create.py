@@ -1,11 +1,11 @@
 from celery_app import celery_app
-from repository.create import create_user_psql
+from repository.create import main_create_user_psql
 from messaging.publisher import publish_user_created
 
 
 @celery_app.task
-def create_user_task(name: str, lastname: str, email: str, age: str, city: str):
-    result = create_user_psql(name, lastname, email, age, city)
+def main_create_user_task(name: str, lastname: str, email: str, age: str, city: str):
+    result = main_create_user_psql(name, lastname, email, age, city)
     
     if result.get('status_code') == 201:
         user_data = {

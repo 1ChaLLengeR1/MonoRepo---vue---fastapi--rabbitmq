@@ -1,7 +1,7 @@
 from database.db import get_db
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from service_backend.database.model import UserTwo
+from database.model import UserTwo
 
 
 def delete_user_psql(user_id: str) -> dict:

@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from service_backend.utils.env import get_env_variable
+from utils.env import get_env_variable
 
 host = get_env_variable("DB_HOST")
 port = get_env_variable("DB_PORT")

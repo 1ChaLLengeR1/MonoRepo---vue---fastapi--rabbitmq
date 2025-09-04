@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from database.model import UserOne
 
 
-def create_user_psql(name: str, lastname: str, email: str, age: str, city: str) -> dict:
+def main_create_user_psql(name: str, lastname: str, email: str, age: str, city: str) -> dict:
     db_generator = get_db()
     db: Session = next(db_generator)
     try:

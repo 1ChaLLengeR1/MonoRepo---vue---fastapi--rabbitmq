@@ -20,7 +20,7 @@ services:
       POSTGRES_PASSWORD: zaq1@WSX
       POSTGRES_DB: main_db
     ports:
-      - "5433:5432"
+      - "5450:5432"
     volumes:
       - postgres_main_data:/var/lib/postgresql/data
 
@@ -48,14 +48,19 @@ services:
       - ./main_backend:/app
     environment:
       - PYTHONPATH=/app
-#  backend_service:
-#    build: ./service_backend
-#    container_name: backend_service
-#    depends_on:
-#      - postgres_service
-#      - rabbitmq
-#    ports:
-#      - "4000:4000"
+
+  backend_service:
+    build: ./service_backend
+    container_name: backend_service
+    depends_on:
+      - postgres_service
+      - rabbitmq
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./service_backend:/app
+    environment:
+      - PYTHONPATH=/app
 
   celery_worker:
     build: ./main_backend

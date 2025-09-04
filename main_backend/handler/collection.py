@@ -1,8 +1,8 @@
-from repository.collection import collection_user_psql
+from repository.collection import main_collection_user_psql
 
 async def handler_collection_user() -> dict:
     try:
-        result = await collection_user_psql()
+        result = await main_collection_user_psql()
         return result
     except Exception as e:
         return {

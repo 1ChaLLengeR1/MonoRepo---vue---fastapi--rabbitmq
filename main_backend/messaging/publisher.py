@@ -70,6 +70,6 @@ def publish_user_updated(user_data: dict):
     publish_message_with_retry("update", user_data)
 
 
-def publish_user_deleted(user_id: str):
-    user_data = {"id": user_id}
+def publish_user_deleted(email: str):
+    user_data = {"email": email}
     publish_message_with_retry("delete", user_data)

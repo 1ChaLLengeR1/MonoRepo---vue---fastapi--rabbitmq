@@ -1,8 +1,8 @@
-from tasks.delete import delete_user_task
+from tasks.delete import main_delete_user_task
 
 async def handler_delete_user(user_id: str) -> dict:
     try:
-        task = delete_user_task.delay(user_id)
+        task = main_delete_user_task.delay(user_id)
         
         return {
             "message": "User deletion task started",

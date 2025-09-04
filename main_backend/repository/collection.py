@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from database.model import UserOne
 
 
-async def collection_user_psql() -> dict:
+async def main_collection_user_psql() -> dict:
     db_generator = get_db()
     db: Session = next(db_generator)
     try:

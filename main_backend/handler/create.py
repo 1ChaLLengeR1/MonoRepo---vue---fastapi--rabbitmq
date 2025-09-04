@@ -1,9 +1,9 @@
-from tasks.create import create_user_task
+from tasks.create import main_create_user_task
 
 
 async def handler_create_user(name: str, lastname: str, email: str, age: str, city: str) -> dict:
     try:
-        task = create_user_task.delay(name, lastname, email, age, city)
+        task = main_create_user_task.delay(name, lastname, email, age, city)
         return {
             "message": "User creation task started",
             "status_code": 202,

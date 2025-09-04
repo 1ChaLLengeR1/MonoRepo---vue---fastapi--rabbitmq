@@ -1,7 +1,7 @@
 from database.db import get_db
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from service_backend.database.model import UserTwo
+from database.model import UserTwo
 
 
 def update_user_psql(user_id: str, name: str = None, lastname: str = None, email: str = None, age: str = None, city: str = None) -> dict:
