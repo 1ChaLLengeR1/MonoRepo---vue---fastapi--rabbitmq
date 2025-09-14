@@ -4,7 +4,8 @@ from sqlalchemy.exc import IntegrityError
 from database.model import UserOne
 
 
-def main_update_user_psql(user_id: str, name: str = None, lastname: str = None, email: str = None, age: str = None, city: str = None) -> dict:
+def main_update_user_psql(user_id: str, name: str = None, lastname: str = None, email: str = None, age: str = None,
+                          city: str = None) -> dict:
     db_generator = get_db()
     db: Session = next(db_generator)
     try:
@@ -14,7 +15,7 @@ def main_update_user_psql(user_id: str, name: str = None, lastname: str = None, 
                 "message": "User not found",
                 "status_code": 404
             }
-        
+
         if name is not None:
             user.name = name
         if lastname is not None:
@@ -25,14 +26,14 @@ def main_update_user_psql(user_id: str, name: str = None, lastname: str = None, 
             user.age = age
         if city is not None:
             user.city = city
-            
+
         db.commit()
         db.refresh(user)
-        
+
         return {
             "message": "User updated successfully",
             "status_code": 200,
-            "user_id": str(user.id)
+            "email": str(user.email)
         }
 
     except IntegrityError as e:

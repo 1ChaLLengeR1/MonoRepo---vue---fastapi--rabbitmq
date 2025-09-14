@@ -4,18 +4,19 @@ from sqlalchemy.exc import IntegrityError
 from database.model import UserTwo
 
 
-def update_user_psql(user_id: str, name: str = None, lastname: str = None, email: str = None, age: str = None, city: str = None) -> dict:
+def update_user_psql(user_id: str, name: str = None, lastname: str = None, email: str = None, age: str = None,
+                     city: str = None) -> dict:
     db_generator = get_db()
     db: Session = next(db_generator)
     try:
-        user = db.query(UserTwo).filter(UserTwo.id == user_id).first()
-        
+        user = db.query(UserTwo).filter(UserTwo.email == email).first()
+
         if not user:
             return {
-                "message": "User not found",
+                "message": f"User not found for this user_id: {user_id}",
                 "status_code": 404
             }
-        
+
         if name is not None:
             user.name = name
         if lastname is not None:
@@ -26,14 +27,14 @@ def update_user_psql(user_id: str, name: str = None, lastname: str = None, email
             user.age = age
         if city is not None:
             user.city = city
-            
+
         db.commit()
         db.refresh(user)
-        
+
         return {
             "message": "User updated successfully in service_backend",
             "status_code": 200,
-            "user_id": str(user.id)
+            "email": str(user.email)
         }
 
     except ValueError:

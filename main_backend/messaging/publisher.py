@@ -5,9 +5,6 @@ from datetime import datetime
 
 
 def publish_message_with_retry(action: str, user_data: dict,  max_retries: int = 3, retry_delay: float = 1.0):
-    """
-    Publish message with retry logic using short-lived connections
-    """
     message = {
         "action": action,
         "user_data": user_data,
@@ -44,7 +41,7 @@ def publish_message_with_retry(action: str, user_data: dict,  max_retries: int =
                 )
             )
             
-            print(f"Successfully published {action} message for user: {user_data.get('id', 'unknown')}")
+            print(f"Successfully published {action} message for user: {user_data.get('id') or user_data.get('email', 'unknown')}")
             return True
             
         except Exception as e:

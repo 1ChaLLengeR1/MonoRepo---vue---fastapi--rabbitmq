@@ -1,14 +1,14 @@
 from database.db import get_db
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 from database.model import UserTwo
 
 
-def delete_user_psql(user_id: str) -> dict:
+def delete_user_psql(email: str) -> dict:
     db_generator = get_db()
     db: Session = next(db_generator)
     try:
-        user = db.query(UserTwo).filter(UserTwo.id == user_id).first()
+        user = db.query(UserTwo).filter(UserTwo.email == email).first()
+        print(user)
 
         if not user:
             return {
@@ -22,7 +22,7 @@ def delete_user_psql(user_id: str) -> dict:
         return {
             "message": "User deleted successfully from service_backend",
             "status_code": 200,
-            "user_id": str(user_id)
+            "email": str(email)
         }
 
     except ValueError:

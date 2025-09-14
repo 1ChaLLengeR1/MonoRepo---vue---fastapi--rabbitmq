@@ -65,6 +65,7 @@ class RabbitMQConsumer:
                     age=user_data.get('age'),
                     city=user_data.get('city')
                 )
+                result = update_user_psql(result)
                 print(f"Update result: {result}")
 
             elif action == 'delete':
