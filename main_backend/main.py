@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from celery_app import celery_app
 from handler.create import handler_create_user
-from handler.collection import handler_collection_user
+from handler.collection import handler_collection_user, handler_collection_tasks
 from handler.delete import handler_delete_user
 from handler.update import handler_update_user
 
@@ -26,7 +26,6 @@ async def hello_world():
 
 @app_main.post("/users")
 async def create_user(user: UserCreate):
-    # result = create_user_psql(user.name, user.lastname, user.email, user.age, user.city)
     result = await handler_create_user(user.name, user.lastname, user.email, user.age, user.city)
     return result
 
@@ -34,6 +33,12 @@ async def create_user(user: UserCreate):
 @app_main.get("/users/collection")
 async def collection_user():
     result = await handler_collection_user()
+    return result
+
+
+@app_main.get("/tasks/collection")
+async def collection_tasks():
+    result = await handler_collection_tasks()
     return result
 
 
