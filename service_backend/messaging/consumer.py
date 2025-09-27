@@ -77,13 +77,9 @@ class RabbitMQConsumer:
 
         except Exception as e:
             print(f"Error processing message: {str(e)}")
-            # Reject the message and don't requeue it
             channel.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
 
     def start_consuming_with_reconnect(self):
-        """
-        Start consuming with automatic reconnection logic
-        """
         reconnect_delay = 5.0
 
         while not self.should_stop:

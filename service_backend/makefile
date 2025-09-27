@@ -10,3 +10,10 @@ lint:
 
 run_app:
 	uvicorn main:app --reload --log-level debug --port 4000
+
+# Database Migration Commands
+migrate-up:
+	cd dockerfiles/migration_db && docker-compose -f docker-compose.migration.yml run --rm --build migration bash ./db_migration_up.sh
+
+migrate-down:
+	cd dockerfiles/migration_db && docker-compose -f docker-compose.migration.yml run --rm --build migration bash ./db_migration_down.sh
