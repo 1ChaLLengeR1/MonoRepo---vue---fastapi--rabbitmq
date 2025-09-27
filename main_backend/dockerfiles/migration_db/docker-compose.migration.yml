@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  migration:
+    build:
+      context: ./../..
+      dockerfile: dockerfiles/migration_db/migration.dockerfile
+    env_file:
+      - ./../../.env
+    working_dir: /migration/scripts
+    networks:
+      - default
+
+networks:
+  default:
+    external: true
+    name: monorepo_default
