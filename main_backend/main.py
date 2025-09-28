@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from celery_app import celery_app
 from handler.create import handler_create_user
@@ -6,8 +7,20 @@ from handler.collection import handler_collection_user, handler_collection_tasks
 from handler.delete import handler_delete_user
 from handler.update import handler_update_user
 
+origins = [
+    "http://localhost:5173",
+]
+
 # Tworzymy aplikację FastAPI
 app_main = FastAPI()
+
+app_main.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class UserCreate(BaseModel):
