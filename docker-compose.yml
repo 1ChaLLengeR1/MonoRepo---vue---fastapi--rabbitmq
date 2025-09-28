@@ -73,11 +73,11 @@ services:
     environment:
       - PYTHONPATH=/app
 
-  frontend:
-    build: ./frontend
-    container_name: frontend
-    ports:
-      - "5173:5173"
+#  frontend:
+#    build: ./frontend
+#    container_name: frontend
+#    ports:
+#      - "5173:5173"
 
 
 volumes:
