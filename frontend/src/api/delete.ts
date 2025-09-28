@@ -2,7 +2,7 @@ import { apiSendRequest } from "@/api/common";
 
 export const apiDeleteUser = async (userId: string) => {
   const urlPath = `/users/delete/${userId}`;
-  const response = await apiSendRequest(urlPath, "POST", {});
+  const response = await apiSendRequest(urlPath, "DELETE", {});
   if (!response || response.status_code > 400) {
     return {
       isValid: false,

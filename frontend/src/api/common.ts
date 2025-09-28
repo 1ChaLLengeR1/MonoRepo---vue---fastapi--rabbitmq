@@ -12,6 +12,9 @@ export const apiSendRequest = async (
     const url: string = `${urlApi}${urlPath}`;
     const response = await fetch(url, {
       method: method,
+      headers: {
+        "Content-Type": "application/json", // ← DODAJ TO
+      },
       body: JSON.stringify(body),
     });
 
@@ -36,6 +39,9 @@ export const apiGetRequest = async (
     const url: string = `${urlApi}${urlPath}`;
     const response = await fetch(url, {
       method: "GET",
+      headers: {
+        "Content-Type": "application/json", // ← DODAJ TO
+      },
     });
 
     const responseData: ResponseApi = await response.json();

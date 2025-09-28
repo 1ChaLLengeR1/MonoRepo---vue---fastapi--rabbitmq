@@ -3,7 +3,7 @@ import type { bodyCreateUser } from "@/types/global";
 
 export const apiPatchUser = async (userId: string, body: bodyCreateUser) => {
   const urlPath = `/users/update/${userId}`;
-  const response = await apiSendRequest(urlPath, "POST", body);
+  const response = await apiSendRequest(urlPath, "PATCH", body);
   if (!response || response.status_code > 400) {
     return {
       isValid: false,
