@@ -1,28 +1,29 @@
-# MonoRepo - System Synchronizacji Baz Danych
+# MonoRepo - System Zarządzania Użytkowników z Frontend Vue.js
 
-Projekt demonstracyjny systemu mikrousBug z synchronizacj baz danych przy u|yciu RabbitMQ i Celery.
+Projekt demonstracyjny systemu mikrousług z synchronizacją baz danych przy użyciu RabbitMQ, Celery i interfejsem użytkownika Vue.js.
 
-## =� Opis Projektu
+## 📋 Opis Projektu
 
-Prosty system skBadajcy si z dw�ch backend'�w, kt�re zarzdzaj r�|nymi bazami danych u|ytkownik�w:
-- **main_backend** - zarzdza baz `UserOne` przez REST API
-- **service_backend** - zarzdza baz `UserTwo` przez komunikaty RabbitMQ
+Kompletny system składający się z:
+- **frontend** - aplikacja Vue.js z TypeScript do zarządzania użytkownikami
+- **main_backend** - zarządza bazą `UserOne` przez REST API
+- **service_backend** - zarządza bazą `UserTwo` przez komunikaty RabbitMQ
 
-GB�wny cel: **aktualizacja bazy UserTwo odbywa si automatycznie poprzez RabbitMQ przy ka|dej operacji CRUD na UserOne**.
+Główny cel: **pełna aplikacja webowa z automatyczną synchronizacją baz danych poprzez RabbitMQ przy każdej operacji CRUD**.
 
-## <� Architektura Systemu
+## 🏗️ Architektura Systemu
 
 ```
-                                                           
-   main_backend          RabbitMQ          service_backend 
-   (REST API)       �   (Messaging)      �   (Consumer)    
-                                                           
-   PostgreSQL             Redis              PostgreSQL    
-   (UserOne)             (Celery)            (UserTwo)     
-                                                           
+
+   Frontend              main_backend          RabbitMQ          service_backend
+   (Vue.js)       ←→     (REST API)       →   (Messaging)      →   (Consumer)
+      ↓                                                                ↓
+   Browser               PostgreSQL             Redis              PostgreSQL
+   :5173                 (UserOne)             (Celery)            (UserTwo)
+
 ```
 
-## =� Jak Uruchomi Projekt
+## 🚀 Jak Uruchomić Projekt
 
 ### Wymagania
 - Docker
@@ -34,32 +35,67 @@ GB�wny cel: **aktualizacja bazy UserTwo odbywa si automatycznie poprzez Rabbi
 git clone <repo-url>
 cd MonoRepo
 
-# Uruchomienie wszystkich serwis�w
+# Uruchomienie wszystkich serwisów
 docker-compose up -d
 
-# Sprawdzenie statusu kontener�w
+# Sprawdzenie statusu kontenerów
 docker-compose ps
 ```
 
-## =3 Serwisy Docker
+### Dostęp do aplikacji
+- **Frontend**: http://localhost:5173
+- **Main Backend API**: http://localhost:3000
+- **Service Backend API**: http://localhost:4000
+- **RabbitMQ Panel**: http://localhost:15672 (guest/guest)
+
+## 🐳 Serwisy Docker
 
 | Serwis | Port | Opis |
 |--------|------|------|
-| **backend_main** | 3000 | FastAPI - gB�wny backend z REST API |
+| **frontend** | 5173 | Vue.js - aplikacja webowa |
+| **backend_main** | 3000 | FastAPI - główny backend z REST API |
 | **backend_service** | 4000 | FastAPI - serwis z consumerem RabbitMQ |
-| **celery_worker** | - | Worker Celery do przetwarzania zadaD |
-| **service_consumer** | - | Osobny consumer RabbitMQ |
+| **celery_worker** | - | Worker Celery do przetwarzania zadań |
 | **postgres_main** | 5450 | Baza danych dla UserOne |
 | **postgres_service** | 5434 | Baza danych dla UserTwo |
 | **rabbitmq** | 5672, 15672 | Message broker (panel: http://localhost:15672) |
 | **redis** | 6379 | Backend dla Celery |
 
-## =� Bazy Danych
+## 🎨 Frontend (Vue.js)
+
+### Technologie
+- **Vue 3** z Composition API
+- **TypeScript**
+- **Vite** jako build tool
+- **SASS/SCSS** do stylowania
+- **Vue Router** do routingu
+
+### Komponenty
+- `ShowFormCreateUser.vue` - przycisk do pokazania formularza
+- `FormCreateUser.vue` - formularz tworzenia użytkownika
+- `ListUser.vue` - lista użytkowników z opcjami edycji/usuwania
+- `ListTask.vue` - lista zadań Celery
+
+### API Client
+Kompletny system komunikacji z backend'em:
+- **GET** - pobieranie danych
+- **POST** - tworzenie użytkowników
+- **PATCH** - aktualizacja użytkowników
+- **DELETE** - usuwanie użytkowników
+
+### Uruchomienie w trybie deweloperskim
+```bash
+cd frontend
+pnpm install
+pnpm dev
+```
+
+## 💾 Bazy Danych
 
 ### UserOne (main_backend)
 ```sql
 CREATE TABLE user_one (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255),
     lastname VARCHAR(255),
     email VARCHAR(255),
@@ -71,7 +107,7 @@ CREATE TABLE user_one (
 ### UserTwo (service_backend)
 ```sql
 CREATE TABLE user_two (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255),
     lastname VARCHAR(255),
     email VARCHAR(255),
@@ -83,26 +119,53 @@ CREATE TABLE user_two (
 ### TaskResult (main_backend)
 ```sql
 CREATE TABLE task_results (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     task_id VARCHAR(255) UNIQUE,
-    status ENUM('pending', 'running', 'success', 'failure'),
+    status VARCHAR(50),
     result VARCHAR(1000),
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 ```
 
-## = API Endpoints
+### 🔧 Migracje Bazy Danych
+
+Każdy backend ma system migracji z Makefile:
+
+#### Main Backend
+```bash
+cd main_backend
+
+# Uruchomienie migracji (tworzenie tabel)
+make migrate-up
+
+# Rollback migracji (usuwanie tabel)
+make migrate-down
+```
+
+#### Service Backend
+```bash
+cd service_backend
+
+# Uruchomienie migracji (tworzenie tabel)
+make migrate-up
+
+# Rollback migracji (usuwanie tabel)
+make migrate-down
+```
+
+## 🔌 API Endpoints
 
 ### Main Backend (port 3000)
 
-#### U|ytkownicy
-- **POST** `/users` - Tworzy u|ytkownika (UserOne) i wysyBa zadanie Celery
-- **GET** `/users/collection` - Pobiera list wszystkich u|ytkownik�w (UserOne)
-- **PATCH** `/users/update/{user_id}` - Aktualizuje u|ytkownika (UserOne)
-- **DELETE** `/users/delete/{user_id}` - Usuwa u|ytkownika (UserOne)
+#### Użytkownicy
+- **POST** `/users` - Tworzy użytkownika (UserOne) i wysyła zadanie Celery
+- **GET** `/users/collection` - Pobiera listę wszystkich użytkowników (UserOne)
+- **PATCH** `/users/update/{user_id}` - Aktualizuje użytkownika (UserOne)
+- **DELETE** `/users/delete/{user_id}` - Usuwa użytkownika (UserOne)
 
-#### Zadania Celery
+#### Zadania
+- **GET** `/tasks/collection` - Pobiera listę zadań Celery
 - **GET** `/task/{task_id}` - Sprawdza status zadania Celery
 
 #### Test
@@ -113,10 +176,10 @@ CREATE TABLE task_results (
 #### Test
 - **GET** `/hello` - Test endpoint
 
-### PrzykBad u|ycia:
+### Przykład użycia:
 
 ```bash
-# Tworzenie u|ytkownika
+# Tworzenie użytkownika
 curl -X POST http://localhost:3000/users \
   -H "Content-Type: application/json" \
   -d '{
@@ -130,11 +193,11 @@ curl -X POST http://localhost:3000/users \
 # Sprawdzenie statusu zadania
 curl http://localhost:3000/task/{task_id}
 
-# Pobranie listy u|ytkownik�w
+# Pobranie listy użytkowników
 curl http://localhost:3000/users/collection
 ```
 
-## � Celery - System ZadaD
+## ⚡ Celery - System Zadań
 
 ### Konfiguracja
 - **Broker**: RabbitMQ (pyamqp://guest:guest@rabbitmq:5672//)
@@ -144,38 +207,38 @@ curl http://localhost:3000/users/collection
 ### Zadania Celery
 
 #### 1. `main_create_user_task`
-- Tworzy u|ytkownika w bazie UserOne
-- WysyBa komunikat do RabbitMQ o utworzeniu u|ytkownika
+- Tworzy użytkownika w bazie UserOne
+- Wysyła komunikat do RabbitMQ o utworzeniu użytkownika
 - Lokalizacja: `main_backend/tasks/create.py`
 
 #### 2. `main_update_user_task`
-- Aktualizuje u|ytkownika w bazie UserOne
-- WysyBa komunikat do RabbitMQ o aktualizacji u|ytkownika
+- Aktualizuje użytkownika w bazie UserOne
+- Wysyła komunikat do RabbitMQ o aktualizacji użytkownika
 - Lokalizacja: `main_backend/tasks/update.py`
 
 #### 3. `main_delete_user_task`
-- Usuwa u|ytkownika z bazy UserOne
-- WysyBa komunikat do RabbitMQ o usuniciu u|ytkownika
+- Usuwa użytkownika z bazy UserOne
+- Wysyła komunikat do RabbitMQ o usunięciu użytkownika
 - Lokalizacja: `main_backend/tasks/delete.py`
 
-### Monitorowanie zadaD Celery
+### Monitorowanie zadań Celery
 ```bash
 # Logi worker'a Celery
 docker logs monorepo-celery_worker-1 -f
 
-# Status zadaD przez API
+# Status zadań przez API
 curl http://localhost:3000/task/{task_id}
 ```
 
-## =0 RabbitMQ - System Komunikat�w
+## 🐰 RabbitMQ - System Komunikatów
 
 ### Konfiguracja
 - **Host**: rabbitmq:5672
 - **Credentials**: guest/guest
 - **Queue**: `user.sync` (durable)
-- **Panel zarzdzania**: http://localhost:15672
+- **Panel zarządzania**: http://localhost:15672
 
-### Format komunikat�w
+### Format komunikatów
 ```json
 {
   "action": "create|update|delete",
@@ -200,55 +263,58 @@ curl http://localhost:3000/task/{task_id}
 
 ### Consumer (service_backend)
 - **Lokalizacja**: `service_backend/messaging/consumer.py`
-- **Funkcjonalno[**: Automatyczne przetwarzanie komunikat�w i aktualizacja bazy UserTwo
+- **Funkcjonalność**: Automatyczne przetwarzanie komunikatów i aktualizacja bazy UserTwo
 
 ### Monitorowanie RabbitMQ
 ```bash
 # Logi consumer'a
 docker logs monorepo-service_consumer-1 -f
 
-# Panel zarzdzania RabbitMQ
+# Panel zarządzania RabbitMQ
 # http://localhost:15672 (guest/guest)
 ```
 
-## = PrzepByw Danych
+## 🔄 Przepływ Danych
 
-### Tworzenie u|ytkownika
-1. **POST** `/users` � main_backend
+### Tworzenie użytkownika
+1. **Frontend** → **POST** `/users` → main_backend
 2. Handler uruchamia zadanie Celery `main_create_user_task`
 3. Zadanie Celery:
-   - Zapisuje u|ytkownika do bazy UserOne
-   - WysyBa komunikat do RabbitMQ
+   - Zapisuje użytkownika do bazy UserOne
+   - Wysyła komunikat do RabbitMQ
 4. Consumer RabbitMQ:
    - Odbiera komunikat
-   - Zapisuje u|ytkownika do bazy UserTwo
+   - Zapisuje użytkownika do bazy UserTwo
 
-### Aktualizacja u|ytkownika
-1. **PATCH** `/users/update/{user_id}` � main_backend
+### Aktualizacja użytkownika
+1. **Frontend** → **PATCH** `/users/update/{user_id}` → main_backend
 2. Handler uruchamia zadanie Celery `main_update_user_task`
 3. Zadanie Celery:
-   - Aktualizuje u|ytkownika w bazie UserOne
-   - WysyBa komunikat do RabbitMQ
+   - Aktualizuje użytkownika w bazie UserOne
+   - Wysyła komunikat do RabbitMQ
 4. Consumer RabbitMQ:
    - Odbiera komunikat
-   - Aktualizuje u|ytkownika w bazie UserTwo (wyszukuje po email)
+   - Aktualizuje użytkownika w bazie UserTwo (wyszukuje po email)
 
-### Usuwanie u|ytkownika
-1. **DELETE** `/users/delete/{user_id}` � main_backend
+### Usuwanie użytkownika
+1. **Frontend** → **DELETE** `/users/delete/{user_id}` → main_backend
 2. Handler uruchamia zadanie Celery `main_delete_user_task`
 3. Zadanie Celery:
-   - Usuwa u|ytkownika z bazy UserOne
-   - WysyBa komunikat do RabbitMQ
+   - Usuwa użytkownika z bazy UserOne
+   - Wysyła komunikat do RabbitMQ
 4. Consumer RabbitMQ:
    - Odbiera komunikat
-   - Usuwa u|ytkownika z bazy UserTwo (wyszukuje po email)
+   - Usuwa użytkownika z bazy UserTwo (wyszukuje po email)
 
-## =� Logi i Monitoring
+## 📊 Logi i Monitoring
 
 ### Gdzie znajdziesz logi:
 
 ```bash
-# GB�wny backend
+# Frontend
+docker logs frontend -f
+
+# Główny backend
 docker logs backend_main -f
 
 # Service backend
@@ -266,21 +332,21 @@ docker-compose logs -f
 
 ### Bazy danych
 ```bash
-# PoBczenie z baz main
+# Połączenie z bazą main
 docker exec -it postgres_main psql -U postgres -d main_db
 
-# PoBczenie z baz service
+# Połączenie z bazą service
 docker exec -it postgres_service psql -U postgres -d service_db
 ```
 
-## =� Troubleshooting
+## 🛠️ Troubleshooting
 
-### Problem z poBczeniem do RabbitMQ
+### Problem z połączeniem do RabbitMQ
 ```bash
 # Restart consumer'a
 docker-compose restart service_consumer
 
-# Sprawdz logi RabbitMQ
+# Sprawdź logi RabbitMQ
 docker logs rabbitmq
 ```
 
@@ -289,51 +355,93 @@ docker logs rabbitmq
 # Restart worker'a
 docker-compose restart celery_worker
 
-# Sprawdz poBczenie z Redis
+# Sprawdź połączenie z Redis
 docker exec -it redis redis-cli ping
 ```
 
 ### Problem z bazami danych
 ```bash
-# Sprawdz status baz
+# Sprawdź status baz
 docker-compose ps | grep postgres
 
 # Restart bazy danych
 docker-compose restart postgres_main postgres_service
 ```
 
-## =� Struktura Projektu
+### Problem z Frontend
+```bash
+# Sprawdź logi frontend'u
+docker logs frontend -f
+
+# Restart frontend'u
+docker-compose restart frontend
+
+# Sprawdź czy Vite nasłuchuje na właściwym hoście
+# Frontend powinien być dostępny na http://localhost:5173
+```
+
+## 📁 Struktura Projektu
 
 ```
 MonoRepo/
-   main_backend/                 # GB�wny backend (REST API)
-      handler/                  # Endpointy API
-      repository/               # Operacje na bazie danych
-      tasks/                    # Zadania Celery
-      messaging/                # Publisher RabbitMQ
-      database/                 # Modele i poBczenie z baz
-      main.py                   # Aplikacja FastAPI
-      celery_app.py            # Konfiguracja Celery
-   service_backend/              # Backend z consumer'em RabbitMQ
-      repository/               # Operacje na bazie danych
-      messaging/                # Consumer RabbitMQ
-      database/                 # Modele i poBczenie z baz
-      main.py                   # Aplikacja FastAPI
-   docker-compose.yml            # Konfiguracja wszystkich serwis�w
-   README.md                     # Ta dokumentacja
+├── frontend/                     # Aplikacja Vue.js
+│   ├── src/
+│   │   ├── components/          # Komponenty Vue
+│   │   ├── api/                 # API client
+│   │   ├── types/               # Definicje TypeScript
+│   │   └── App.vue              # Główny komponent
+│   ├── Dockerfile               # Obraz Docker dla frontend'u
+│   └── package.json             # Zależności Node.js
+├── main_backend/                 # Główny backend (REST API)
+│   ├── handler/                 # Endpointy API
+│   ├── repository/              # Operacje na bazie danych
+│   ├── tasks/                   # Zadania Celery
+│   ├── messaging/               # Publisher RabbitMQ
+│   ├── database/                # Modele i połączenie z bazą
+│   ├── dockerfiles/             # Pliki Docker dla migracji
+│   ├── main.py                  # Aplikacja FastAPI
+│   ├── celery_app.py           # Konfiguracja Celery
+│   └── makefile                 # Komendy migracji i uruchamiania
+├── service_backend/              # Backend z consumer'em RabbitMQ
+│   ├── repository/              # Operacje na bazie danych
+│   ├── messaging/               # Consumer RabbitMQ
+│   ├── database/                # Modele i połączenie z bazą
+│   ├── dockerfiles/             # Pliki Docker dla migracji
+│   ├── main.py                  # Aplikacja FastAPI
+│   └── makefile                 # Komendy migracji i uruchamiania
+├── docker-compose.yml            # Konfiguracja wszystkich serwisów
+└── README.md                     # Ta dokumentacja
 ```
 
-## <� Kluczowe Cechy
+## ✨ Kluczowe Cechy
 
- **Asynchroniczne przetwarzanie** - Celery worker'y
- **Komunikacja midzy serwisami** - RabbitMQ
- **Automatyczna synchronizacja baz** - Consumer RabbitMQ
- **Monitoring zadaD** - Status API Celery
- **Separacja kontener�w** - Docker Compose
- **ObsBuga bBd�w** - Retry logic w publisher'ze
- **Real-time logi** - Osobne kontenery dla lepszego debugowania
+✅ **Kompletna aplikacja webowa** - Frontend Vue.js z TypeScript
+✅ **Asynchroniczne przetwarzanie** - Celery worker'y
+✅ **Komunikacja między serwisami** - RabbitMQ
+✅ **Automatyczna synchronizacja baz** - Consumer RabbitMQ
+✅ **Monitoring zadań** - Status API Celery
+✅ **Separacja kontenerów** - Docker Compose
+✅ **Obsługa błędów** - Retry logic w publisher'ze
+✅ **Real-time logi** - Osobne kontenery dla lepszego debugowania
+✅ **System migracji** - Makefile commands dla obu backend'ów
+✅ **CORS configuration** - Prawidłowa komunikacja frontend ↔ backend
+✅ **TypeScript support** - Silne typowanie w całej aplikacji
 
-## =h
-=� Autorzy
+## 🏃‍♂️ Quick Start
 
-Projekt stworzony do demonstracji architektury mikrousBug z synchronizacj baz danych.
+1. **Uruchom wszystko**:
+   ```bash
+   docker-compose up -d
+   ```
+
+2. **Otwórz frontend**: http://localhost:5173
+
+3. **Utwórz użytkownika** przez formularz w przeglądarce
+
+4. **Sprawdź synchronizację** - użytkownik powinien pojawić się w obu bazach danych
+
+5. **Monitoruj zadania** w panelu aplikacji
+
+## 📧 Kontakt
+
+Projekt stworzony do demonstracji architektury mikrousług z pełnym frontend'em Vue.js i synchronizacją baz danych.
